@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  zeebe:
+    container_name: zeebe
+    build: zeebe-plus-hazelcast
+    image: epfl-idevfsd/zeebe-plus-hazelcast
+    ports:
+      - "26500:26500"   # can connect using Camunda Modeler, even though it doesn't actually work
+    networks:
+      - zeebe
+  monitor:
+    container_name: zeebe-simple-monitor
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:latest
+    environment:
+      - zeebe.client.broker.contactPoint=zeebe:26500
+      - zeebe.client.worker.hazelcast.connection=zeebe:5701
+    ports:
+      - "8082:8082"
+    networks:
+      - zeebe
+    depends_on:
+      - zeebe
+
+networks:
+  zeebe: {}
